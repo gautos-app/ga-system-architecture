@@ -1,61 +1,62 @@
 ```mermaid
 graph TD
-    %% Definición de estilos
-    classDef usuario fill:#ffffff,stroke:#333,stroke-width:2px,color:#000;
-    classDef appNode fill:#0d47a1,stroke:#002171,stroke-width:2px,color:#fff,font-weight:bold;
-    classDef logicNode fill:#212121,stroke:#000,stroke-width:2px,color:#fff;
-    classDef storageNode fill:#ffffff,stroke:#9e9e9e,stroke-width:2px,color:#212121;
-    classDef externalNode fill:#fcfcfc,stroke:#b0bec5,stroke-width:1px,color:#546e7a,stroke-dasharray: 5 5;
-    
-    %% Estilo de los contenedores (Quitando el amarillo)
-    classDef subgStyle fill:#f5f7f9,stroke:#cfd8dc,stroke-width:1px,color:#37474f,font-weight:bold;
+    classDef userStyle fill:#ffffff,stroke:#333,stroke-width:2px,color:#000,rx:50,ry:50;
+    classDef appStyle fill:#0d47a1,stroke:#002171,stroke-width:3px,color:#fff,font-weight:bold,rx:10,ry:10;
+    classDef logicStyle fill:#212121,stroke:#000,stroke-width:2px,color:#fff,rx:5,ry:5;
+    classDef infraStyle fill:#ffffff,stroke:#9e9e9e,stroke-width:2px,color:#212121,rx:5,ry:5;
+    classDef apiStyle fill:#fcfcfc,stroke:#b0bec5,stroke-width:1px,color:#546e7a,stroke-dasharray: 5 5,rx:5,ry:5;
+    classDef containerStyle fill:#f8f9fa,stroke:#cfd8dc,stroke-width:1px,color:#37474f;
+    classDef subContainerStyle fill:#ffffff,stroke:#e0e0e0,stroke-width:1px,stroke-dasharray: 5 5;
 
-    %% Nivel 1: Usuario
-    User(("Usuario")):::usuario
+    User(Usuario):::userStyle
 
-    %% Nivel 2: Frontend
-    subgraph Frontend ["Frontend"]
-        App["App GAutos Mobile<br/>(Flutter Framework)"]:::appNode
-        Cache["Secure Storage / Hive"]:::storageNode
+    subgraph APIs [🌎 Servicios Externos]
+        direction TB
+        Identity[DNI / Identidad]:::apiStyle
+        Vehicle[Placa / Vehicular]:::apiStyle
+        Finance[Dólar / Cambio]:::apiStyle
+        Maps[Google Maps SDK]:::apiStyle
     end
 
-    %% Nivel 3: Backend
-    subgraph Backend ["Backend"]
-        Auth["Firebase Authentication<br/>(JWT / Identity)"]:::storageNode
-        Firestore[("Cloud Firestore<br/>(NoSQL DB)")]:::storageNode
-        Storage[("Cloud Storage<br/>(Digital Assets)")]:::storageNode
-        Functions["Cloud Functions<br/>(Backend Logic / ROI)"]:::logicNode
+    subgraph Device [📱 Dispositivo Móvil]
+        direction TB
+        App[GAutos App]:::appStyle
+        
+        subgraph Local [Persistencia y Lógica]
+            direction LR
+            Logic[Financial Logic]:::logicStyle
+            Cache[Secure Storage]:::infraStyle
+        end
     end
 
-    %% Nivel 4: API Externas
-    subgraph Externos ["External Integrations"]
-        Maps["Google Maps SDK"]:::externalNode
-        Identity["Identity Services<br/>(RENIEC / SUNARP)"]:::externalNode
-        Finance["Currency API<br/>(SBS Exchange)"]:::externalNode
+    subgraph Cloud [☁️ Backend Firebase]
+        direction TB
+        Auth[Auth]:::infraStyle
+        Firestore[Firestore DB]:::infraStyle
+        Storage[Storage]:::infraStyle
     end
 
-    %% Relaciones y Flujos
-    User ---|interactúa| App
-    App --- Cache
+    User ==>|Usa| App
 
-    %% Conexiones Seguras
-    App ==>|HTTPS / TLS| Auth
-    App ==>|Stream / App Check| Firestore
-    App ==>|Binary Upload| Storage
+    App <--> Logic
+    App <--> Cache
 
-    %% Lógica de Negocio
-    Firestore -.->|Trigger| Functions
-    
-    %% Integraciones
-    App --- Maps
-    Functions ---|Server-side| Identity
-    Functions ---|Server-side| Finance
+    App -.->|HTTP| Identity
+    App -.->|HTTP| Vehicle
+    App -.->|HTTP| Finance
+    App -.->|SDK| Maps
 
-    %% Aplicación de estilos a subgrafos
-    class Frontend,Backend,Externos subgStyle;
+    App ==>|Login| Auth
+    App ==>|Datos| Firestore
+    App ==>|Fotos/PDF| Storage
 
-    %% Estilo de las líneas
+    Identity ~~~ App
+    App ~~~ Auth
+
+    class Device,Cloud,APIs containerStyle;
+    class Local subContainerStyle;
+
     linkStyle default stroke:#546e7a,stroke-width:1px;
-    linkStyle 3,4,5 stroke:#0d47a1,stroke-width:2px;
+    linkStyle 0,7,8,9 stroke:#0d47a1,stroke-width:3px;
 ```
 
